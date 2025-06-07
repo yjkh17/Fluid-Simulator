@@ -11,7 +11,9 @@ import SwiftUI
 struct Fluid_SimulatorApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainView()
+                .preferredColorScheme(.dark)
+                .statusBarHidden()
         }
     }
 }
