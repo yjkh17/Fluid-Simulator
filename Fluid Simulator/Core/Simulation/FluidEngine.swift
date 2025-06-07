@@ -13,6 +13,7 @@ class FluidEngine: ObservableObject {
     @Published var parameters: FluidParameters
     private let serialQueue = DispatchQueue(label: "fluid.simulation", qos: .userInteractive)
     private let stateLock = NSLock()
+    private var frameCount = 0
 
     init(width: Int, height: Int, parameters: FluidParameters = .default) {
         self.state = FluidState(width: width, height: height)
@@ -41,14 +42,43 @@ class FluidEngine: ObservableObject {
     }
     
     private func performStep() {
-        // Only skip if there's absolutely no fluid activity
+        // OPTIMIZED: More efficient skip checking
         if shouldSkipEntireSimulation() {
             return
         }
         
-        velocityStep()
-        densityStep()
-        colorStep()
+        // OPTIMIZED: Reduce frequency of expensive operations
+        if frameCount % 2 == 0 {  // Only do full step every other frame
+            velocityStep()
+            densityStep()
+            colorStep()
+        } else {
+            // Light step - just advection
+            lightStep()
+        }
+        
+        frameCount += 1
+    }
+    
+    // OPTIMIZED: Light step for better performance
+    private func lightStep() {
+        // Only do advection and light fade - much faster
+        swapArray(&state.density, &state.previousDensity)
+        advect(&state.density, state.previousDensity, state.velocityX, state.velocityY)
+        
+        swapArray(&state.colorR, &state.previousColorR)
+        swapArray(&state.colorG, &state.previousColorG)
+        swapArray(&state.colorB, &state.previousColorB)
+        
+        advect(&state.colorR, state.previousColorR, state.velocityX, state.velocityY)
+        advect(&state.colorG, state.previousColorG, state.velocityX, state.velocityY)
+        advect(&state.colorB, state.previousColorB, state.velocityX, state.velocityY)
+        
+        // Light fade
+        applyFade(&state.density)
+        applyFade(&state.colorR)
+        applyFade(&state.colorG)
+        applyFade(&state.colorB)
     }
     
     // Much more conservative skipping - only skip when truly empty

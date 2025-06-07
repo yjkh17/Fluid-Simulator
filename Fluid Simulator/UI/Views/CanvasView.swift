@@ -202,9 +202,9 @@ struct FluidCanvasView: View {
     }
     
     private func startSimulation() {
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0/25.0, repeats: true) { _ in
+        timer = Timer.scheduledTimer(withTimeInterval: 1.0/30.0, repeats: true) { _ in
             frameCount += 1
-            // Step the fluid simulation at 25 FPS
+            // OPTIMIZED: Step the fluid simulation at 30 FPS instead of 25
             fluidEngine.step()
         }
     }

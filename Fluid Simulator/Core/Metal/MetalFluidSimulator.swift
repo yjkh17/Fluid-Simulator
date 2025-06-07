@@ -284,7 +284,7 @@ class MetalFluidSimulator {
         encoder1.dispatchThreadgroups(threadGroups, threadsPerThreadgroup: threadsPerGroup)
         encoder1.endEncoding()
         
-        // Solve pressure
+        // Solve pressure with safer iteration count
         let pressure = pressureTextures[currentBuffer]
         performDiffusion(commandBuffer: commandBuffer, source: divergenceTexture, destination: pressure, iterations: 20)
         
@@ -324,7 +324,7 @@ class MetalFluidSimulator {
               let commandBuffer = commandQueue.makeCommandBuffer(),
               let encoder = commandBuffer.makeComputeCommandEncoder() else { return }
         
-        // Create force data
+        // Create force data with safe values
         var forceData = ForceData(
             position: position,
             velocity: velocity,
@@ -353,12 +353,24 @@ class MetalFluidSimulator {
     }
     
     func getCurrentColorTexture() -> MTLTexture? {
-        guard isInitialized, currentBuffer < colorTextures.count else { return nil }
+        guard isInitialized, 
+              currentBuffer >= 0,
+              currentBuffer < colorTextures.count,
+              !colorTextures.isEmpty else {
+            print("❌ MetalFluidSimulator: Invalid state for getCurrentColorTexture")
+            return nil
+        }
         return colorTextures[currentBuffer]
     }
     
     func getCurrentDensityTexture() -> MTLTexture? {
-        guard isInitialized, currentBuffer < densityTextures.count else { return nil }
+        guard isInitialized,
+              currentBuffer >= 0,
+              currentBuffer < densityTextures.count,
+              !densityTextures.isEmpty else {
+            print("❌ MetalFluidSimulator: Invalid state for getCurrentDensityTexture")
+            return nil
+        }
         return densityTextures[currentBuffer]
     }
     

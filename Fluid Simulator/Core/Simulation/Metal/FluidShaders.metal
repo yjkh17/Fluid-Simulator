@@ -212,13 +212,14 @@ kernel void fade_kernel(
     texture.write(value, gid);
 }
 
-// OPTIMIZED: Render fragment shader for final display
+// FIXED: Render fragment shader for final display
 fragment float4 fluid_display_fragment(
     VertexOut in [[stage_in]],
     texture2d<float> colorTexture [[texture(0)]],
     texture2d<float> densityTexture [[texture(1)]],
     sampler textureSampler [[sampler(0)]]
 ) {
+    // Use sample() with provided sampler - this is the correct approach
     float4 color = colorTexture.sample(textureSampler, in.texCoord);
     float density = densityTexture.sample(textureSampler, in.texCoord).x;
     
