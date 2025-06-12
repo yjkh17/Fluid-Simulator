@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreHaptics
 
 class HapticsManager: ObservableObject {
     private let impactFeedback = UIImpactFeedbackGenerator(style: .medium)
@@ -91,5 +92,3 @@ class HapticsManager: ObservableObject {
         }
     }
 }
-
-import CoreHaptics

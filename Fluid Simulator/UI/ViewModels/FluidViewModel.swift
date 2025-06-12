@@ -16,7 +16,7 @@ class FluidViewModel: ObservableObject {
     @Published var isSimulating: Bool = true
     
     private var cancellables = Set<AnyCancellable>()
-    private var simulationTimer: Timer?
+    private var displayLinkTimer: DisplayLinkTimer?
     private let hapticsManager: HapticsManager
     
     init(width: Int, height: Int, hapticsManager: HapticsManager) {
@@ -52,16 +52,17 @@ class FluidViewModel: ObservableObject {
     }
     
     func startSimulation() {
-        simulationTimer = Timer.scheduledTimer(withTimeInterval: 1.0/60.0, repeats: true) { _ in
-            if self.isSimulating {
-                self.fluidEngine.step()
-            }
+        displayLinkTimer = DisplayLinkTimer { [weak self] deltaTime in
+            guard let self = self, self.isSimulating else { return }
+            // Single point of truth for simulation stepping
+            self.fluidEngine.step()
         }
+        displayLinkTimer?.start()
     }
     
     func stopSimulation() {
-        simulationTimer?.invalidate()
-        simulationTimer = nil
+        displayLinkTimer?.stop()
+        displayLinkTimer = nil
     }
     
     func clearSimulation() {
@@ -88,10 +89,6 @@ class FluidViewModel: ObservableObject {
     }
     
     func showSettingsView() {
-        hapticsManager.settingsChanged()
-    }
-    
-    func showRecordingView() {
         hapticsManager.settingsChanged()
     }
     
