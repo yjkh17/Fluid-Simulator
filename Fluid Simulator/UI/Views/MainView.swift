@@ -169,14 +169,6 @@ struct MainView: View {
             // CLEANUP: Update to work with GPU simulator
             GPUSettingsView(simulator: gpuSimulator)
         }
-        .onAppear {
-            // Run verification tests in debug builds
-            #if DEBUG
-            DispatchQueue.global(qos: .background).async {
-                _ = FluidSimulatorTests.testBasicSimulation()
-            }
-            #endif
-        }
     }
 }
 
