@@ -17,6 +17,7 @@ struct FluidParameters: Codable, Equatable {
     
     // Simulation settings - OPTIMIZED: Better performance on CPU
     var iterations: Int = 2
+    var projectionIterations: Int = 4
     var timeStep: Float = 0.016          // Keep original timestep
     var gridSize: SIMD2<Int> = SIMD2(48, 96)
     

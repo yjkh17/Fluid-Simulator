@@ -170,3 +170,11 @@ struct MetalFluidCanvasView: UIViewRepresentable {
         }
     }
 }
+
+#Preview {
+    MetalFluidCanvasView(
+        selectedPalette: ColorPalette.palettes[0],
+        screenSize: CGSize(width: 400, height: 800),
+        fluidEngine: FluidEngine(width: 32, height: 64)
+    )
+}
