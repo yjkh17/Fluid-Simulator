@@ -30,9 +30,10 @@ class FluidSimulatorGPU: ObservableObject {
     
     // MARK: - Properties
     
-    private let device: MTLDevice
+    let device: MTLDevice
     private let commandQueue: MTLCommandQueue
     private var gpuState: FluidGPUState?
+    private var drawable: MTLDrawable?
     
     // Pipeline states for each kernel
     private var advectionPSO: MTLComputePipelineState?
@@ -202,7 +203,7 @@ class FluidSimulatorGPU: ObservableObject {
     }
     
     private func setupUniforms() {
-        let size = MemoryLayout<MetalFluidUniforms>.size
+        let size = MemoryLayout<GPUFluidUniforms>.size
         uniformsBuffer = device.makeBuffer(length: size, options: .storageModeShared)
     }
     
@@ -385,14 +386,14 @@ class FluidSimulatorGPU: ObservableObject {
         }
         
         // Create force data
-        var forceData = ForceData(
+        var forceData = GPUForceData(
             position: position,
             velocity: velocity,
             radius: radius,
             color: color
         )
         
-        let forceBuffer = device.makeBuffer(bytes: &forceData, length: MemoryLayout<ForceData>.size, options: .storageModeShared)
+        let forceBuffer = device.makeBuffer(bytes: &forceData, length: MemoryLayout<GPUForceData>.size, options: .storageModeShared)
         
         encoder.setComputePipelineState(pso)
         encoder.setTexture(gpuState.velocity[gpuState.current], index: 0)
@@ -409,7 +410,7 @@ class FluidSimulatorGPU: ObservableObject {
     
     // MARK: - Rendering
     
-    func render(to renderPassDescriptor: MTLRenderPassDescriptor) {
+    func render(to renderPassDescriptor: MTLRenderPassDescriptor, drawable: MTLDrawable) {
         guard let gpuState = gpuState,
               let renderPSO = renderPSO,
               let sampler = sampler,
@@ -427,6 +428,108 @@ class FluidSimulatorGPU: ObservableObject {
         encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         encoder.endEncoding()
         
+        commandBuffer.present(drawable)
+        commandBuffer.commit()
+    }
+    
+    // MARK: - Step 5: Verification & Debug Read-back
+    
+    /// Read back GPU texture data for verification (blueprint Step 5)
+    func readBackDensity(completion: @escaping ([Float]) -> Void) {
+        guard let gpuState = gpuState,
+              let commandBuffer = commandQueue.makeCommandBuffer() else {
+            completion([])
+            return
+        }
+        
+        let texture = gpuState.density[gpuState.current]
+        let bytesPerRow = texture.width * MemoryLayout<Float>.size
+        let totalBytes = texture.height * bytesPerRow
+        
+        guard let buffer = device.makeBuffer(length: totalBytes, options: .storageModeShared) else {
+            completion([])
+            return
+        }
+        
+        guard let blitEncoder = commandBuffer.makeBlitCommandEncoder() else {
+            completion([])
+            return
+        }
+        
+        blitEncoder.copy(from: texture,
+                        sourceSlice: 0,
+                        sourceLevel: 0,
+                        sourceOrigin: MTLOrigin(x: 0, y: 0, z: 0),
+                        sourceSize: MTLSize(width: texture.width, height: texture.height, depth: 1),
+                        to: buffer,
+                        destinationOffset: 0,
+                        destinationBytesPerRow: bytesPerRow,
+                        destinationBytesPerImage: totalBytes)
+        
+        blitEncoder.endEncoding()
+        
+        commandBuffer.addCompletedHandler { _ in
+            let data = buffer.contents().bindMemory(to: Float.self, capacity: texture.width * texture.height)
+            let array = Array(UnsafeBufferPointer(start: data, count: texture.width * texture.height))
+            
+            DispatchQueue.main.async {
+                completion(array)
+            }
+        }
+        
+        commandBuffer.commit()
+    }
+    
+    /// Mass conservation check (blueprint verification)
+    func getTotalDensity(completion: @escaping (Float) -> Void) {
+        readBackDensity { densityArray in
+            let total = densityArray.reduce(0, +)
+            completion(total)
+        }
+    }
+    
+    /// Pixel-perfect comparison helper (blueprint verification)
+    func readBackColorTexture(completion: @escaping (Data?) -> Void) {
+        guard let gpuState = gpuState,
+              let commandBuffer = commandQueue.makeCommandBuffer() else {
+            completion(nil)
+            return
+        }
+        
+        let texture = gpuState.color[gpuState.current]
+        let bytesPerPixel = 4 * MemoryLayout<Float16>.size // RGBA16Float
+        let bytesPerRow = texture.width * bytesPerPixel
+        let totalBytes = texture.height * bytesPerRow
+        
+        guard let buffer = device.makeBuffer(length: totalBytes, options: .storageModeShared) else {
+            completion(nil)
+            return
+        }
+        
+        guard let blitEncoder = commandBuffer.makeBlitCommandEncoder() else {
+            completion(nil)
+            return
+        }
+        
+        blitEncoder.copy(from: texture,
+                        sourceSlice: 0,
+                        sourceLevel: 0,
+                        sourceOrigin: MTLOrigin(x: 0, y: 0, z: 0),
+                        sourceSize: MTLSize(width: texture.width, height: texture.height, depth: 1),
+                        to: buffer,
+                        destinationOffset: 0,
+                        destinationBytesPerRow: bytesPerRow,
+                        destinationBytesPerImage: totalBytes)
+        
+        blitEncoder.endEncoding()
+        
+        commandBuffer.addCompletedHandler { _ in
+            let data = Data(bytes: buffer.contents(), count: totalBytes)
+            DispatchQueue.main.async {
+                completion(data)
+            }
+        }
+        
         commandBuffer.commit()
     }
     
@@ -435,7 +538,7 @@ class FluidSimulatorGPU: ObservableObject {
     private func updateUniforms() {
         guard let buffer = uniformsBuffer?.contents() else { return }
         
-        var uniforms = MetalFluidUniforms(
+        var uniforms = GPUFluidUniforms(
             dt: parameters.timeStep,
             viscosity: parameters.viscosity,
             diffusion: parameters.diffusion,
@@ -446,7 +549,7 @@ class FluidSimulatorGPU: ObservableObject {
             iterations: UInt32(parameters.projectionIterations)
         )
         
-        buffer.copyMemory(from: &uniforms, byteCount: MemoryLayout<MetalFluidUniforms>.size)
+        buffer.copyMemory(from: &uniforms, byteCount: MemoryLayout<GPUFluidUniforms>.size)
     }
     
     func clear() {
@@ -473,7 +576,21 @@ class FluidSimulatorGPU: ObservableObject {
     
     private func clearTexture(commandBuffer: MTLCommandBuffer, texture: MTLTexture) {
         guard let blitEncoder = commandBuffer.makeBlitCommandEncoder() else { return }
-        blitEncoder.fill(texture: texture, level: 0, slice: 0, with: MTLClearColor(red: 0, green: 0, blue: 0, alpha: 0))
+        
+        // FIXED: Use proper clear method for textures
+        let region = MTLRegion(origin: MTLOrigin(x: 0, y: 0, z: 0),
+                              size: MTLSize(width: texture.width, height: texture.height, depth: 1))
+        
+        // Create empty data buffer
+        let bytesPerPixel = 4 * MemoryLayout<Float>.size // RGBA float
+        let bytesPerRow = texture.width * bytesPerPixel
+        let totalBytes = texture.height * bytesPerRow
+        let emptyData = Data(count: totalBytes)
+        
+        emptyData.withUnsafeBytes { bytes in
+            texture.replace(region: region, mipmapLevel: 0, withBytes: bytes.baseAddress!, bytesPerRow: bytesPerRow)
+        }
+        
         blitEncoder.endEncoding()
     }
     
@@ -490,7 +607,7 @@ class FluidSimulatorGPU: ObservableObject {
 
 // MARK: - Supporting Structures
 
-struct MetalFluidUniforms {
+struct GPUFluidUniforms {
     let dt: Float
     let viscosity: Float
     let diffusion: Float
@@ -501,7 +618,7 @@ struct MetalFluidUniforms {
     let iterations: UInt32
 }
 
-struct ForceData {
+struct GPUForceData {
     let position: SIMD2<Float>
     let velocity: SIMD2<Float>
     let radius: Float

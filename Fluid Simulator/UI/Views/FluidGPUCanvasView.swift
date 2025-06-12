@@ -68,7 +68,7 @@ struct FluidGPUCanvasView: UIViewRepresentable {
             simulator.step()
             
             // Render directly from GPU textures
-            simulator.render(to: renderPassDescriptor)
+            simulator.render(to: renderPassDescriptor, drawable: drawable)
         }
         
         @objc func handleDrag(_ gesture: UIPanGestureRecognizer) {
@@ -129,13 +129,16 @@ struct FluidGPUCanvasView: UIViewRepresentable {
 }
 
 #Preview {
-    if let device = MTLCreateSystemDefaultDevice(),
-       let simulator = FluidSimulatorGPU(device: device, width: 128, height: 256) {
-        FluidGPUCanvasView(
-            selectedPalette: ColorPalette.palettes[0],
-            screenSize: CGSize(width: 400, height: 800),
-            simulator: simulator
-        )
+    if let device = MTLCreateSystemDefaultDevice() {
+        if let simulator = FluidSimulatorGPU(device: device, width: 128, height: 256) {
+            FluidGPUCanvasView(
+                selectedPalette: ColorPalette.palettes[0],
+                screenSize: CGSize(width: 400, height: 800),
+                simulator: simulator
+            )
+        } else {
+            Text("Failed to create GPU simulator")
+        }
     } else {
         Text("Metal not available")
     }
