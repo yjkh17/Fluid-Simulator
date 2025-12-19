@@ -12,6 +12,7 @@ struct DebugOverlayView: View {
     @ObservedObject var simulator: FluidSimulatorGPU
     @State private var fps: Double = 0
     @State private var frameTime: Double = 0
+    @State private var effectiveDt: Double = 0
     @State private var totalDensity: Float = 0
     @State private var lastUpdateTime = Date()
     
@@ -27,6 +28,10 @@ struct DebugOverlayView: View {
                 .foregroundColor(.white)
             
             Text("Frame: \(frameTime, specifier: "%.2f")ms")
+                .font(.caption2)
+                .foregroundColor(.white)
+            
+            Text("dt: \(effectiveDt, specifier: "%.3f")ms (target \(1000.0 / 120.0, specifier: "%.2f")ms)")
                 .font(.caption2)
                 .foregroundColor(.white)
             
@@ -63,6 +68,7 @@ struct DebugOverlayView: View {
         if delta > 0 {
             fps = 1.0 / delta
             frameTime = delta * 1000.0 // Convert to milliseconds
+            effectiveDt = Double(simulator.lastStepDelta) * 1000.0
         }
         
         lastUpdateTime = now

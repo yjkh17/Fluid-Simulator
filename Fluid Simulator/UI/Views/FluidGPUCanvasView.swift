@@ -7,6 +7,7 @@
 
 import SwiftUI
 import MetalKit
+import QuartzCore
 
 /// Step 4: GPU-first canvas view using FluidSimulatorGPU as single source of truth
 struct FluidGPUCanvasView: UIViewRepresentable {
@@ -45,11 +46,21 @@ struct FluidGPUCanvasView: UIViewRepresentable {
     class Coordinator: NSObject, MTKViewDelegate {
         let simulator: FluidSimulatorGPU
         var selectedPalette: ColorPalette
+        private var displayLink: CADisplayLink?
+        private var latestDisplayLinkTimestamp: CFTimeInterval?
+        private var lastFrameTimestamp: CFTimeInterval?
+        private var lastCommandBufferEndTime: CFTimeInterval?
+        private let maxDeltaTime: Float = 1.0 / 30.0
         
         init(simulator: FluidSimulatorGPU, selectedPalette: ColorPalette) {
             self.simulator = simulator
             self.selectedPalette = selectedPalette
             super.init()
+            startDisplayLink()
+        }
+
+        deinit {
+            displayLink?.invalidate()
         }
         
         func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
@@ -61,14 +72,39 @@ struct FluidGPUCanvasView: UIViewRepresentable {
                   let renderPassDescriptor = view.currentRenderPassDescriptor else {
                 return
             }
-            
+
             renderPassDescriptor.colorAttachments[0].clearColor = MTLClearColor(red: 0, green: 0, blue: 0, alpha: 1)
+
+            let currentTimestamp = lastCommandBufferEndTime ?? latestDisplayLinkTimestamp ?? CACurrentMediaTime()
+            let defaultDelta = 1.0 / Double(view.preferredFramesPerSecond)
+            let rawDelta = lastFrameTimestamp.map { currentTimestamp - $0 } ?? defaultDelta
+            lastFrameTimestamp = currentTimestamp
+            let clampedDt = min(max(Float(rawDelta), 0), maxDeltaTime)
             
             // Step simulation on GPU
-            simulator.step()
+            simulator.step(dt: clampedDt)
             
             // Render directly from GPU textures
-            simulator.render(to: renderPassDescriptor, drawable: drawable)
+            simulator.render(to: renderPassDescriptor, drawable: drawable) { [weak self] commandBuffer in
+                commandBuffer.addCompletedHandler { cb in
+                    let gpuEndTime = cb.gpuEndTime
+                    let completionTime = gpuEndTime.isFinite && gpuEndTime > 0 ? gpuEndTime : CACurrentMediaTime()
+                    DispatchQueue.main.async {
+                        self?.lastCommandBufferEndTime = completionTime
+                    }
+                }
+            }
+        }
+
+        private func startDisplayLink() {
+            let link = CADisplayLink(target: self, selector: #selector(handleDisplayLink(_:)))
+            link.preferredFramesPerSecond = 120
+            link.add(to: .main, forMode: .common)
+            displayLink = link
+        }
+
+        @objc private func handleDisplayLink(_ link: CADisplayLink) {
+            latestDisplayLinkTimestamp = link.targetTimestamp
         }
         
         @objc func handleDrag(_ gesture: UIPanGestureRecognizer) {
