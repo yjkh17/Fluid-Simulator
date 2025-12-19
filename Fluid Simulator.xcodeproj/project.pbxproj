@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CBF1A0002F0A000100A1B2C3 /* Fluid_SimulatorApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B2002F0A000100A1B2C3 /* Fluid_SimulatorApp.swift */; };
 		CBF1A00B2EFD9A0B00A1B2C3 /* FluidSaverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0012EFD9A0B00A1B2C3 /* FluidSaverView.swift */; };
 		CBF1A00C2EFD9A0B00A1B2C3 /* FluidSaverRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0022EFD9A0B00A1B2C3 /* FluidSaverRenderer.swift */; };
 		CBF1A00D2EFD9A0B00A1B2C3 /* FluidSim.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0032EFD9A0B00A1B2C3 /* FluidSim.swift */; };
@@ -16,6 +17,22 @@
 		CBF1A0112EFD9A0B00A1B2C3 /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBF1A0082EFD9A0B00A1B2C3 /* ScreenSaver.framework */; };
 		CBF1A0122EFD9A0B00A1B2C3 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBF1A0092EFD9A0B00A1B2C3 /* Metal.framework */; };
 		CBF1A0132EFD9A0B00A1B2C3 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBF1A00A2EFD9A0B00A1B2C3 /* MetalKit.framework */; };
+		CBF1B1002F0A000100A1B2C3 /* MainView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B2022F0A000100A1B2C3 /* MainView.swift */; };
+		CBF1B1012F0A000100A1B2C3 /* FluidGPUCanvasView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B2032F0A000100A1B2C3 /* FluidGPUCanvasView.swift */; };
+		CBF1B1022F0A000100A1B2C3 /* GPUSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B2042F0A000100A1B2C3 /* GPUSettingsView.swift */; };
+		CBF1B1032F0A000100A1B2C3 /* DebugOverlayView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B2052F0A000100A1B2C3 /* DebugOverlayView.swift */; };
+		CBF1B1042F0A000100A1B2C3 /* HapticsManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B2062F0A000100A1B2C3 /* HapticsManager.swift */; };
+		CBF1B1052F0A000100A1B2C3 /* SettingsStore.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B2072F0A000100A1B2C3 /* SettingsStore.swift */; };
+		CBF1B1062F0A000100A1B2C3 /* ColorPalette.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B2082F0A000100A1B2C3 /* ColorPalette.swift */; };
+		CBF1B1072F0A000100A1B2C3 /* DisplayLinkTimer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B2092F0A000100A1B2C3 /* DisplayLinkTimer.swift */; };
+		CBF1B1082F0A000100A1B2C3 /* DitheringTexture.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B20A2F0A000100A1B2C3 /* DitheringTexture.swift */; };
+		CBF1B1092F0A000100A1B2C3 /* FluidSimulatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B20B2F0A000100A1B2C3 /* FluidSimulatorTests.swift */; };
+		CBF1B10A2F0A000100A1B2C3 /* CGPoint+Utils.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B20C2F0A000100A1B2C3 /* CGPoint+Utils.swift */; };
+		CBF1B10B2F0A000100A1B2C3 /* UIColor+Hex.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1B20D2F0A000100A1B2C3 /* UIColor+Hex.swift */; };
+		CBF1B10C2F0A000100A1B2C3 /* FluidSimulatorGPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0052EFD9A0B00A1B2C3 /* FluidSimulatorGPU.swift */; };
+		CBF1B10D2F0A000100A1B2C3 /* FluidParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0062EFD9A0B00A1B2C3 /* FluidParameters.swift */; };
+		CBF1B10E2F0A000100A1B2C3 /* FluidShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0072EFD9A0B00A1B2C3 /* FluidShaders.metal */; };
+		CBF1B10F2F0A000100A1B2C3 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = CBF1B2012F0A000100A1B2C3 /* Assets.xcassets */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -25,21 +42,27 @@
 		CBF1A0022EFD9A0B00A1B2C3 /* FluidSaverRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluidSaverRenderer.swift; sourceTree = "<group>"; };
 		CBF1A0032EFD9A0B00A1B2C3 /* FluidSim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluidSim.swift; sourceTree = "<group>"; };
 		CBF1A0042EFD9A0B00A1B2C3 /* FluidSaver-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FluidSaver-Info.plist"; sourceTree = "<group>"; };
-		CBF1A0052EFD9A0B00A1B2C3 /* FluidSimulatorGPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FluidSimulatorGPU.swift; path = "Fluid Simulator/Core/Simulation/FluidSimulatorGPU.swift"; sourceTree = "<group>"; };
-		CBF1A0062EFD9A0B00A1B2C3 /* FluidParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FluidParameters.swift; path = "Fluid Simulator/Core/Simulation/FluidParameters.swift"; sourceTree = "<group>"; };
-		CBF1A0072EFD9A0B00A1B2C3 /* FluidShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; name = FluidShaders.metal; path = "Fluid Simulator/Core/Simulation/Metal/FluidShaders.metal"; sourceTree = "<group>"; };
+		CBF1A0052EFD9A0B00A1B2C3 /* FluidSimulatorGPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FluidSimulatorGPU.swift; path = "Fluid Simulator/Core/Simulation/FluidSimulatorGPU.swift"; sourceTree = SOURCE_ROOT; };
+		CBF1A0062EFD9A0B00A1B2C3 /* FluidParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FluidParameters.swift; path = "Fluid Simulator/Core/Simulation/FluidParameters.swift"; sourceTree = SOURCE_ROOT; };
+		CBF1A0072EFD9A0B00A1B2C3 /* FluidShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; name = FluidShaders.metal; path = "Fluid Simulator/Core/Simulation/Metal/FluidShaders.metal"; sourceTree = SOURCE_ROOT; };
 		CBF1A0082EFD9A0B00A1B2C3 /* ScreenSaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScreenSaver.framework; path = System/Library/Frameworks/ScreenSaver.framework; sourceTree = SDKROOT; };
 		CBF1A0092EFD9A0B00A1B2C3 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		CBF1A00A2EFD9A0B00A1B2C3 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
+		CBF1B2002F0A000100A1B2C3 /* Fluid_SimulatorApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fluid_SimulatorApp.swift; sourceTree = "<group>"; };
+		CBF1B2012F0A000100A1B2C3 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		CBF1B2022F0A000100A1B2C3 /* MainView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainView.swift; sourceTree = "<group>"; };
+		CBF1B2032F0A000100A1B2C3 /* FluidGPUCanvasView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluidGPUCanvasView.swift; sourceTree = "<group>"; };
+		CBF1B2042F0A000100A1B2C3 /* GPUSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = GPUSettingsView.swift; sourceTree = "<group>"; };
+		CBF1B2052F0A000100A1B2C3 /* DebugOverlayView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DebugOverlayView.swift; sourceTree = "<group>"; };
+		CBF1B2062F0A000100A1B2C3 /* HapticsManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HapticsManager.swift; sourceTree = "<group>"; };
+		CBF1B2072F0A000100A1B2C3 /* SettingsStore.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingsStore.swift; sourceTree = "<group>"; };
+		CBF1B2082F0A000100A1B2C3 /* ColorPalette.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ColorPalette.swift; sourceTree = "<group>"; };
+		CBF1B2092F0A000100A1B2C3 /* DisplayLinkTimer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DisplayLinkTimer.swift; sourceTree = "<group>"; };
+		CBF1B20A2F0A000100A1B2C3 /* DitheringTexture.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DitheringTexture.swift; sourceTree = "<group>"; };
+		CBF1B20B2F0A000100A1B2C3 /* FluidSimulatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluidSimulatorTests.swift; sourceTree = "<group>"; };
+		CBF1B20C2F0A000100A1B2C3 /* CGPoint+Utils.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "CGPoint+Utils.swift"; sourceTree = "<group>"; };
+		CBF1B20D2F0A000100A1B2C3 /* UIColor+Hex.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIColor+Hex.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFileSystemSynchronizedRootGroup section */
-		CA08EDEC2DF2C7D60011C6C5 /* Fluid Simulator */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "Fluid Simulator";
-			sourceTree = "<group>";
-		};
-/* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		CA08EDE72DF2C7D60011C6C5 /* Frameworks */ = {
@@ -68,8 +91,8 @@
 				CA08EDEC2DF2C7D60011C6C5 /* Fluid Simulator */,
 				CA08EDEB2DF2C7D60011C6C5 /* Products */,
 				CBF1A0222EFD9A0B00A1B2C3 /* Frameworks */,
-				CBF1A0212EFD9A0B00A1B2C3 /* Shared Simulation */,
 				CBF1A0202EFD9A0B00A1B2C3 /* FluidSaver */,
+				CBF1B3072F0A000100A1B2C3 /* Extensions */,
 			);
 			sourceTree = "<group>";
 		};
@@ -113,6 +136,91 @@
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
+		CA08EDEC2DF2C7D60011C6C5 /* Fluid Simulator */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1B2002F0A000100A1B2C3 /* Fluid_SimulatorApp.swift */,
+				CBF1B3042F0A000100A1B2C3 /* UI */,
+				CBF1B3002F0A000100A1B2C3 /* Core */,
+				CBF1B2012F0A000100A1B2C3 /* Assets.xcassets */,
+			);
+			path = "Fluid Simulator";
+			sourceTree = "<group>";
+		};
+		CBF1B3002F0A000100A1B2C3 /* Core */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1B3012F0A000100A1B2C3 /* Interaction */,
+				CBF1B3022F0A000100A1B2C3 /* Persistence */,
+				CBF1B3032F0A000100A1B2C3 /* Rendering */,
+				CBF1A0212EFD9A0B00A1B2C3 /* Shared Simulation */,
+				CBF1B3062F0A000100A1B2C3 /* Testing */,
+			);
+			path = Core;
+			sourceTree = "<group>";
+		};
+		CBF1B3012F0A000100A1B2C3 /* Interaction */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1B2062F0A000100A1B2C3 /* HapticsManager.swift */,
+			);
+			path = Interaction;
+			sourceTree = "<group>";
+		};
+		CBF1B3022F0A000100A1B2C3 /* Persistence */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1B2072F0A000100A1B2C3 /* SettingsStore.swift */,
+			);
+			path = Persistence;
+			sourceTree = "<group>";
+		};
+		CBF1B3032F0A000100A1B2C3 /* Rendering */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1B2082F0A000100A1B2C3 /* ColorPalette.swift */,
+				CBF1B2092F0A000100A1B2C3 /* DisplayLinkTimer.swift */,
+				CBF1B20A2F0A000100A1B2C3 /* DitheringTexture.swift */,
+			);
+			path = Rendering;
+			sourceTree = "<group>";
+		};
+		CBF1B3042F0A000100A1B2C3 /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1B3052F0A000100A1B2C3 /* Views */,
+			);
+			path = UI;
+			sourceTree = "<group>";
+		};
+		CBF1B3052F0A000100A1B2C3 /* Views */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1B2022F0A000100A1B2C3 /* MainView.swift */,
+				CBF1B2032F0A000100A1B2C3 /* FluidGPUCanvasView.swift */,
+				CBF1B2042F0A000100A1B2C3 /* GPUSettingsView.swift */,
+				CBF1B2052F0A000100A1B2C3 /* DebugOverlayView.swift */,
+			);
+			path = Views;
+			sourceTree = "<group>";
+		};
+		CBF1B3062F0A000100A1B2C3 /* Testing */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1B20B2F0A000100A1B2C3 /* FluidSimulatorTests.swift */,
+			);
+			path = Testing;
+			sourceTree = "<group>";
+		};
+		CBF1B3072F0A000100A1B2C3 /* Extensions */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1B20C2F0A000100A1B2C3 /* CGPoint+Utils.swift */,
+				CBF1B20D2F0A000100A1B2C3 /* UIColor+Hex.swift */,
+			);
+			path = Extensions;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -127,9 +235,6 @@
 			buildRules = (
 			);
 			dependencies = (
-			);
-			fileSystemSynchronizedGroups = (
-				CA08EDEC2DF2C7D60011C6C5 /* Fluid Simulator */,
 			);
 			name = "Fluid Simulator";
 			packageProductDependencies = (
@@ -200,6 +305,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CBF1B10F2F0A000100A1B2C3 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -217,6 +323,22 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CBF1B1032F0A000100A1B2C3 /* DebugOverlayView.swift in Sources */,
+				CBF1B1012F0A000100A1B2C3 /* FluidGPUCanvasView.swift in Sources */,
+				CBF1B10D2F0A000100A1B2C3 /* FluidParameters.swift in Sources */,
+				CBF1B1082F0A000100A1B2C3 /* DitheringTexture.swift in Sources */,
+				CBF1B1042F0A000100A1B2C3 /* HapticsManager.swift in Sources */,
+				CBF1B1062F0A000100A1B2C3 /* ColorPalette.swift in Sources */,
+				CBF1B1092F0A000100A1B2C3 /* FluidSimulatorTests.swift in Sources */,
+				CBF1B10B2F0A000100A1B2C3 /* UIColor+Hex.swift in Sources */,
+				CBF1B1072F0A000100A1B2C3 /* DisplayLinkTimer.swift in Sources */,
+				CBF1B1052F0A000100A1B2C3 /* SettingsStore.swift in Sources */,
+				CBF1B10A2F0A000100A1B2C3 /* CGPoint+Utils.swift in Sources */,
+				CBF1B10E2F0A000100A1B2C3 /* FluidShaders.metal in Sources */,
+				CBF1B1002F0A000100A1B2C3 /* MainView.swift in Sources */,
+				CBF1A0002F0A000100A1B2C3 /* Fluid_SimulatorApp.swift in Sources */,
+				CBF1B10C2F0A000100A1B2C3 /* FluidSimulatorGPU.swift in Sources */,
+				CBF1B1022F0A000100A1B2C3 /* GPUSettingsView.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
