@@ -1,10 +1,12 @@
 //
+//
 //  PipelineBuilder.swift
 //  Fluid Simulator
 //
 //  Created by Yousef Jawdat on 06/06/2025.
 //
 
+import Foundation
 import Metal
 import MetalKit
 
@@ -14,7 +16,9 @@ class PipelineBuilder {
     
     init?(device: MTLDevice) {
         self.device = device
-        guard let library = device.makeDefaultLibrary() else {
+        let bundle = Bundle(for: PipelineBuilder.self)
+        guard let library = try? device.makeDefaultLibrary(bundle: bundle) else {
+            NSLog("❌ Failed to load Metal library from bundle: \(bundle.bundlePath)")
             return nil
         }
         self.library = library
