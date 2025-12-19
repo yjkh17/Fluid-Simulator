@@ -9,21 +9,41 @@ import SwiftUI
 import Metal
 
 struct MainView: View {
+    @ObservedObject var settingsStore: SettingsStore
     @StateObject private var hapticsManager = HapticsManager()
     @StateObject private var gpuSimulator: FluidSimulatorGPU
-    @State private var selectedPalette = ColorPalette.palettes[0]
     @State private var showSettings = false
     @State private var showDebugOverlay = false
     
     // CLEANUP: GPU simulator is now the single source of truth
-    init() {
+    init(settingsStore: SettingsStore = SettingsStore()) {
+        self._settingsStore = ObservedObject(wrappedValue: settingsStore)
+        
         // Create GPU simulator with optimal dimensions for performance (following blueprint)
         guard let device = MTLCreateSystemDefaultDevice(),
               let simulator = FluidSimulatorGPU(device: device, width: 128, height: 256) else {
             fatalError("Failed to create GPU simulator - Metal not available")
         }
         
+        simulator.parameters = settingsStore.fluidParameters
+        let clampedIndex = MainView.clampedPaletteIndex(settingsStore.interactionSettings.selectedPaletteIndex)
+        if clampedIndex != settingsStore.interactionSettings.selectedPaletteIndex {
+            var updatedSettings = settingsStore.interactionSettings
+            updatedSettings.selectedPaletteIndex = clampedIndex
+            settingsStore.interactionSettings = updatedSettings
+            SettingsStore.save(interactionSettings: updatedSettings)
+        }
+        
         self._gpuSimulator = StateObject(wrappedValue: simulator)
+    }
+    
+    private var selectedPalette: ColorPalette {
+        let index = MainView.clampedPaletteIndex(settingsStore.interactionSettings.selectedPaletteIndex)
+        return ColorPalette.palettes[index]
+    }
+    
+    private var interactionSettings: SettingsStore.InteractionSettings {
+        settingsStore.interactionSettings
     }
     
     var body: some View {
@@ -36,6 +56,7 @@ struct MainView: View {
                 // CLEANUP: Only GPU path remains - single source of truth
                 FluidGPUCanvasView(
                     selectedPalette: selectedPalette,
+                    interactionSettings: interactionSettings,
                     screenSize: geometry.size,
                     simulator: gpuSimulator
                 )
@@ -153,7 +174,7 @@ struct MainView: View {
                                     .scaleEffect(selectedPalette.name == palette.name ? 1.05 : 1.0)
                                     .animation(.spring(response: 0.3), value: selectedPalette.name)
                                     .onTapGesture {
-                                        selectedPalette = palette
+                                        updateSelectedPalette(index: index)
                                         hapticsManager.colorChanged()
                                     }
                                 }
@@ -167,8 +188,23 @@ struct MainView: View {
         }
         .sheet(isPresented: $showSettings) {
             // CLEANUP: Update to work with GPU simulator
-            GPUSettingsView(simulator: gpuSimulator)
+            GPUSettingsView(simulator: gpuSimulator, settingsStore: settingsStore)
         }
+        .onChange(of: settingsStore.interactionSettings) { newValue in
+            SettingsStore.save(interactionSettings: newValue)
+        }
+    }
+    
+    private static func clampedPaletteIndex(_ index: Int) -> Int {
+        guard !ColorPalette.palettes.isEmpty else { return 0 }
+        return min(max(index, 0), ColorPalette.palettes.count - 1)
+    }
+    
+    private func updateSelectedPalette(index: Int) {
+        guard !ColorPalette.palettes.isEmpty else { return }
+        var updatedSettings = settingsStore.interactionSettings
+        updatedSettings.selectedPaletteIndex = MainView.clampedPaletteIndex(index)
+        settingsStore.interactionSettings = updatedSettings
     }
 }
 

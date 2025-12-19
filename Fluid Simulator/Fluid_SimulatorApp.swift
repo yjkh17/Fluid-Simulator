@@ -9,9 +9,11 @@ import SwiftUI
 
 @main
 struct Fluid_SimulatorApp: App {
+    @StateObject private var settingsStore = SettingsStore()
+    
     var body: some Scene {
         WindowGroup {
-            MainView()
+            MainView(settingsStore: settingsStore)
                 .preferredColorScheme(.dark)
                 .statusBarHidden()
         }
