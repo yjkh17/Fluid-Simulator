@@ -225,18 +225,13 @@ class FluidSimulatorGPU: ObservableObject {
             return
         }
 
-        if let dt {
-            parameters.timeStep = dt
-            DispatchQueue.main.async {
-                self.lastStepDelta = dt
-            }
-        } else {
-            DispatchQueue.main.async {
-                self.lastStepDelta = self.parameters.timeStep
-            }
+        let stepDt = dt ?? parameters.timeStep
+
+        DispatchQueue.main.async {
+            self.lastStepDelta = stepDt
         }
         
-        updateUniforms()
+        updateUniforms(dt: stepDt)
         
         let src = gpuState.current
         let dst = gpuState.swap()
@@ -548,11 +543,11 @@ class FluidSimulatorGPU: ObservableObject {
     
     // MARK: - Utilities
     
-    private func updateUniforms() {
+    private func updateUniforms(dt: Float) {
         guard let buffer = uniformsBuffer?.contents() else { return }
         
         var uniforms = GPUFluidUniforms(
-            dt: parameters.timeStep,
+            dt: dt,
             viscosity: parameters.viscosity,
             diffusion: parameters.diffusion,
             fadeRate: parameters.fadeRate,
