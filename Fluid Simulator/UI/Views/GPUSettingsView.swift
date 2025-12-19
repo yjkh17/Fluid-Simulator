@@ -10,6 +10,7 @@ import SwiftUI
 /// Settings view for GPU-first fluid simulator
 struct GPUSettingsView: View {
     @ObservedObject var simulator: FluidSimulatorGPU
+    @ObservedObject var settingsStore: SettingsStore
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
@@ -156,13 +157,18 @@ struct GPUSettingsView: View {
                 }
             }
         }
+        .onChange(of: simulator.parameters) { newValue in
+            settingsStore.fluidParameters = newValue
+            SettingsStore.save(fluidParameters: newValue)
+        }
     }
 }
 
 #Preview {
     if let device = MTLCreateSystemDefaultDevice(),
        let simulator = FluidSimulatorGPU(device: device, width: 128, height: 256) {
-        GPUSettingsView(simulator: simulator)
+        let settingsStore = SettingsStore()
+        GPUSettingsView(simulator: simulator, settingsStore: settingsStore)
     } else {
         Text("Metal not available")
     }

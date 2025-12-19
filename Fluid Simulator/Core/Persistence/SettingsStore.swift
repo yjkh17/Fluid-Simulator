@@ -12,6 +12,7 @@ import SwiftUI
 class SettingsStore: ObservableObject {
     @Published var visualSettings: VisualSettings
     @Published var interactionSettings: InteractionSettings
+    @Published var fluidParameters: FluidParameters
     
     // Visual settings for GPU renderer
     struct VisualSettings: Codable {
@@ -34,6 +35,7 @@ class SettingsStore: ObservableObject {
         // Load saved settings or use defaults
         self.visualSettings = SettingsStore.loadVisualSettings() ?? VisualSettings()
         self.interactionSettings = SettingsStore.loadInteractionSettings() ?? InteractionSettings()
+        self.fluidParameters = SettingsStore.loadFluidParameters() ?? FluidParameters()
     }
     
     static func loadVisualSettings() -> VisualSettings? {
@@ -56,13 +58,25 @@ class SettingsStore: ObservableObject {
         UserDefaults.standard.set(data, forKey: "InteractionSettings")
     }
     
+    static func loadFluidParameters() -> FluidParameters? {
+        guard let data = UserDefaults.standard.data(forKey: "FluidParameters") else { return nil }
+        return try? JSONDecoder().decode(FluidParameters.self, from: data)
+    }
+    
+    static func save(fluidParameters: FluidParameters) {
+        guard let data = try? JSONEncoder().encode(fluidParameters) else { return }
+        UserDefaults.standard.set(data, forKey: "FluidParameters")
+    }
+    
     // Reset to defaults
     func resetToDefaults() {
         visualSettings = VisualSettings()
         interactionSettings = InteractionSettings()
+        fluidParameters = FluidParameters()
         
         // Save changes
         SettingsStore.save(visualSettings: visualSettings)
         SettingsStore.save(interactionSettings: interactionSettings)
+        SettingsStore.save(fluidParameters: fluidParameters)
     }
 }

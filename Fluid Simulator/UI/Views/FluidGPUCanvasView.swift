@@ -11,6 +11,7 @@ import MetalKit
 /// Step 4: GPU-first canvas view using FluidSimulatorGPU as single source of truth
 struct FluidGPUCanvasView: UIViewRepresentable {
     let selectedPalette: ColorPalette
+    let interactionSettings: SettingsStore.InteractionSettings
     let screenSize: CGSize
     @ObservedObject var simulator: FluidSimulatorGPU
     
@@ -36,19 +37,26 @@ struct FluidGPUCanvasView: UIViewRepresentable {
     
     func updateUIView(_ uiView: MTKView, context: Context) {
         context.coordinator.selectedPalette = selectedPalette
+        context.coordinator.interactionSettings = interactionSettings
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(simulator: simulator, selectedPalette: selectedPalette)
+        Coordinator(
+            simulator: simulator,
+            selectedPalette: selectedPalette,
+            interactionSettings: interactionSettings
+        )
     }
     
     class Coordinator: NSObject, MTKViewDelegate {
         let simulator: FluidSimulatorGPU
         var selectedPalette: ColorPalette
+        var interactionSettings: SettingsStore.InteractionSettings
         
-        init(simulator: FluidSimulatorGPU, selectedPalette: ColorPalette) {
+        init(simulator: FluidSimulatorGPU, selectedPalette: ColorPalette, interactionSettings: SettingsStore.InteractionSettings) {
             self.simulator = simulator
             self.selectedPalette = selectedPalette
+            self.interactionSettings = interactionSettings
             super.init()
         }
         
@@ -84,9 +92,10 @@ struct FluidGPUCanvasView: UIViewRepresentable {
             )
             
             // Scale velocity appropriately
+            let velocityScale = interactionSettings.splatForce * 0.1
             let normalizedVel = SIMD2<Float>(
-                Float(velocity.x / view.bounds.width * 0.1),
-                Float(-velocity.y / view.bounds.height * 0.1)
+                Float(velocity.x / view.bounds.width * velocityScale),
+                Float(-velocity.y / view.bounds.height * velocityScale)
             )
             
             let color = selectedPalette.getRandomColor()
@@ -95,7 +104,7 @@ struct FluidGPUCanvasView: UIViewRepresentable {
             simulator.addForce(
                 at: normalizedPos,
                 velocity: normalizedVel,
-                radius: 50.0,
+                radius: interactionSettings.splatRadius,
                 color: color
             )
         }
@@ -115,12 +124,12 @@ struct FluidGPUCanvasView: UIViewRepresentable {
             // Create explosion effect with multiple forces
             for i in 0..<8 {
                 let angle = Float(i) * Float.pi * 2.0 / 8.0
-                let explosionVel = SIMD2<Float>(cos(angle), sin(angle)) * 0.2
+                let explosionVel = SIMD2<Float>(cos(angle), sin(angle)) * (0.2 * interactionSettings.splatForce)
                 
                 simulator.addForce(
                     at: normalizedPos,
                     velocity: explosionVel,
-                    radius: 80.0,
+                    radius: interactionSettings.splatRadius,
                     color: color
                 )
             }
@@ -133,6 +142,7 @@ struct FluidGPUCanvasView: UIViewRepresentable {
         if let simulator = FluidSimulatorGPU(device: device, width: 128, height: 256) {
             FluidGPUCanvasView(
                 selectedPalette: ColorPalette.palettes[0],
+                interactionSettings: SettingsStore.InteractionSettings(),
                 screenSize: CGSize(width: 400, height: 800),
                 simulator: simulator
             )
