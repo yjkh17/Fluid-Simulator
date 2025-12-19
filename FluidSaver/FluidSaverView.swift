@@ -89,7 +89,7 @@ final class FluidSaverView: ScreenSaverView {
         metalView.frame = bounds
         metalView.autoresizingMask = [.width, .height]
         metalView.wantsLayer = true
-        metalView.isOpaque = true
+        metalView.layer?.isOpaque = true
         addSubview(metalView)
 
         renderer = FluidSaverRenderer(view: metalView)
