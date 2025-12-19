@@ -6,8 +6,31 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		CBF1A00B2EFD9A0B00A1B2C3 /* FluidSaverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0012EFD9A0B00A1B2C3 /* FluidSaverView.swift */; };
+		CBF1A00C2EFD9A0B00A1B2C3 /* FluidSaverRenderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0022EFD9A0B00A1B2C3 /* FluidSaverRenderer.swift */; };
+		CBF1A00D2EFD9A0B00A1B2C3 /* FluidSim.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0032EFD9A0B00A1B2C3 /* FluidSim.swift */; };
+		CBF1A00E2EFD9A0B00A1B2C3 /* FluidSimulatorGPU.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0052EFD9A0B00A1B2C3 /* FluidSimulatorGPU.swift */; };
+		CBF1A00F2EFD9A0B00A1B2C3 /* FluidParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0062EFD9A0B00A1B2C3 /* FluidParameters.swift */; };
+		CBF1A0102EFD9A0B00A1B2C3 /* FluidShaders.metal in Sources */ = {isa = PBXBuildFile; fileRef = CBF1A0072EFD9A0B00A1B2C3 /* FluidShaders.metal */; };
+		CBF1A0112EFD9A0B00A1B2C3 /* ScreenSaver.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBF1A0082EFD9A0B00A1B2C3 /* ScreenSaver.framework */; };
+		CBF1A0122EFD9A0B00A1B2C3 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBF1A0092EFD9A0B00A1B2C3 /* Metal.framework */; };
+		CBF1A0132EFD9A0B00A1B2C3 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CBF1A00A2EFD9A0B00A1B2C3 /* MetalKit.framework */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		CA08EDEA2DF2C7D60011C6C5 /* Fluid Simulator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Fluid Simulator.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CBF1A0002EFD9A0B00A1B2C3 /* FluidSaver.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = FluidSaver.saver; sourceTree = BUILT_PRODUCTS_DIR; };
+		CBF1A0012EFD9A0B00A1B2C3 /* FluidSaverView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluidSaverView.swift; sourceTree = "<group>"; };
+		CBF1A0022EFD9A0B00A1B2C3 /* FluidSaverRenderer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluidSaverRenderer.swift; sourceTree = "<group>"; };
+		CBF1A0032EFD9A0B00A1B2C3 /* FluidSim.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FluidSim.swift; sourceTree = "<group>"; };
+		CBF1A0042EFD9A0B00A1B2C3 /* FluidSaver-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "FluidSaver-Info.plist"; sourceTree = "<group>"; };
+		CBF1A0052EFD9A0B00A1B2C3 /* FluidSimulatorGPU.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FluidSimulatorGPU.swift; path = "Fluid Simulator/Core/Simulation/FluidSimulatorGPU.swift"; sourceTree = "<group>"; };
+		CBF1A0062EFD9A0B00A1B2C3 /* FluidParameters.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = FluidParameters.swift; path = "Fluid Simulator/Core/Simulation/FluidParameters.swift"; sourceTree = "<group>"; };
+		CBF1A0072EFD9A0B00A1B2C3 /* FluidShaders.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; name = FluidShaders.metal; path = "Fluid Simulator/Core/Simulation/Metal/FluidShaders.metal"; sourceTree = "<group>"; };
+		CBF1A0082EFD9A0B00A1B2C3 /* ScreenSaver.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ScreenSaver.framework; path = System/Library/Frameworks/ScreenSaver.framework; sourceTree = SDKROOT; };
+		CBF1A0092EFD9A0B00A1B2C3 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		CBF1A00A2EFD9A0B00A1B2C3 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -26,6 +49,16 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		CBF1A0312EFD9A0B00A1B2C3 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CBF1A0112EFD9A0B00A1B2C3 /* ScreenSaver.framework in Frameworks */,
+				CBF1A0122EFD9A0B00A1B2C3 /* Metal.framework in Frameworks */,
+				CBF1A0132EFD9A0B00A1B2C3 /* MetalKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -34,6 +67,9 @@
 			children = (
 				CA08EDEC2DF2C7D60011C6C5 /* Fluid Simulator */,
 				CA08EDEB2DF2C7D60011C6C5 /* Products */,
+				CBF1A0222EFD9A0B00A1B2C3 /* Frameworks */,
+				CBF1A0212EFD9A0B00A1B2C3 /* Shared Simulation */,
+				CBF1A0202EFD9A0B00A1B2C3 /* FluidSaver */,
 			);
 			sourceTree = "<group>";
 		};
@@ -41,8 +77,40 @@
 			isa = PBXGroup;
 			children = (
 				CA08EDEA2DF2C7D60011C6C5 /* Fluid Simulator.app */,
+				CBF1A0002EFD9A0B00A1B2C3 /* FluidSaver.saver */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		CBF1A0202EFD9A0B00A1B2C3 /* FluidSaver */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1A0012EFD9A0B00A1B2C3 /* FluidSaverView.swift */,
+				CBF1A0022EFD9A0B00A1B2C3 /* FluidSaverRenderer.swift */,
+				CBF1A0032EFD9A0B00A1B2C3 /* FluidSim.swift */,
+				CBF1A0042EFD9A0B00A1B2C3 /* FluidSaver-Info.plist */,
+			);
+			path = FluidSaver;
+			sourceTree = "<group>";
+		};
+		CBF1A0212EFD9A0B00A1B2C3 /* Shared Simulation */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1A0052EFD9A0B00A1B2C3 /* FluidSimulatorGPU.swift */,
+				CBF1A0062EFD9A0B00A1B2C3 /* FluidParameters.swift */,
+				CBF1A0072EFD9A0B00A1B2C3 /* FluidShaders.metal */,
+			);
+			name = "Shared Simulation";
+			sourceTree = "<group>";
+		};
+		CBF1A0222EFD9A0B00A1B2C3 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				CBF1A0082EFD9A0B00A1B2C3 /* ScreenSaver.framework */,
+				CBF1A0092EFD9A0B00A1B2C3 /* Metal.framework */,
+				CBF1A00A2EFD9A0B00A1B2C3 /* MetalKit.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -70,6 +138,25 @@
 			productReference = CA08EDEA2DF2C7D60011C6C5 /* Fluid Simulator.app */;
 			productType = "com.apple.product-type.application";
 		};
+		CBF1A0332EFD9A0B00A1B2C3 /* FluidSaver */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = CBF1A0362EFD9A0B00A1B2C3 /* Build configuration list for PBXNativeTarget "FluidSaver" */;
+			buildPhases = (
+				CBF1A0302EFD9A0B00A1B2C3 /* Sources */,
+				CBF1A0312EFD9A0B00A1B2C3 /* Frameworks */,
+				CBF1A0322EFD9A0B00A1B2C3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = FluidSaver;
+			packageProductDependencies = (
+			);
+			productName = FluidSaver;
+			productReference = CBF1A0002EFD9A0B00A1B2C3 /* FluidSaver.saver */;
+			productType = "com.apple.product-type.bundle";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -81,6 +168,9 @@
 				LastUpgradeCheck = 2600;
 				TargetAttributes = {
 					CA08EDE92DF2C7D60011C6C5 = {
+						CreatedOnToolsVersion = 16.4;
+					};
+					CBF1A0332EFD9A0B00A1B2C3 = {
 						CreatedOnToolsVersion = 16.4;
 					};
 				};
@@ -100,12 +190,20 @@
 			projectRoot = "";
 			targets = (
 				CA08EDE92DF2C7D60011C6C5 /* Fluid Simulator */,
+				CBF1A0332EFD9A0B00A1B2C3 /* FluidSaver */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		CA08EDE82DF2C7D60011C6C5 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBF1A0322EFD9A0B00A1B2C3 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -119,6 +217,19 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		CBF1A0302EFD9A0B00A1B2C3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				CBF1A00B2EFD9A0B00A1B2C3 /* FluidSaverView.swift in Sources */,
+				CBF1A00C2EFD9A0B00A1B2C3 /* FluidSaverRenderer.swift in Sources */,
+				CBF1A00D2EFD9A0B00A1B2C3 /* FluidSim.swift in Sources */,
+				CBF1A00E2EFD9A0B00A1B2C3 /* FluidSimulatorGPU.swift in Sources */,
+				CBF1A00F2EFD9A0B00A1B2C3 /* FluidParameters.swift in Sources */,
+				CBF1A0102EFD9A0B00A1B2C3 /* FluidShaders.metal in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -304,6 +415,65 @@
 			};
 			name = Release;
 		};
+		CBF1A0342EFD9A0B00A1B2C3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PPNNAHD8ZD;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				INFOPLIST_FILE = "FluidSaver/FluidSaver-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.motherofbrand.FluidSaver";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
+				SUPPORTED_PLATFORMS = "macosx";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Debug;
+		};
+		CBF1A0352EFD9A0B00A1B2C3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CODE_SIGN_STYLE = Automatic;
+				COMBINE_HIDPI_IMAGES = YES;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = PPNNAHD8ZD;
+				ENABLE_HARDENED_RUNTIME = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				INFOPLIST_FILE = "FluidSaver/FluidSaver-Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@loader_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 13.0;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				PRODUCT_BUNDLE_IDENTIFIER = "com.motherofbrand.FluidSaver";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = macosx;
+				SKIP_INSTALL = NO;
+				SUPPORTED_PLATFORMS = "macosx";
+				SWIFT_VERSION = 5.0;
+				WRAPPER_EXTENSION = saver;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -321,6 +491,15 @@
 			buildConfigurations = (
 				CA08EDF62DF2C7D70011C6C5 /* Debug */,
 				CA08EDF72DF2C7D70011C6C5 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		CBF1A0362EFD9A0B00A1B2C3 /* Build configuration list for PBXNativeTarget "FluidSaver" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				CBF1A0342EFD9A0B00A1B2C3 /* Debug */,
+				CBF1A0352EFD9A0B00A1B2C3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

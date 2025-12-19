@@ -218,10 +218,14 @@ class FluidSimulatorGPU: ObservableObject {
     
     // MARK: - Step 3: GPU Dispatcher (replacing FluidEngine.step())
     
-    func step() {
+    func step(dt: Float? = nil) {
         guard let gpuState = gpuState,
               let commandBuffer = commandQueue.makeCommandBuffer() else {
             return
+        }
+
+        if let dt {
+            parameters.timeStep = dt
         }
         
         updateUniforms()
