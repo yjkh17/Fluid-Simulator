@@ -54,12 +54,26 @@ final class FluidSaverView: ScreenSaverView {
         renderer.inject(at: location, delta: delta)
     }
 
+    override func mouseDragged(with event: NSEvent) {
+        guard let renderer = renderer else { return }
+        let location = convert(event.locationInWindow, from: nil)
+        let delta = CGVector(dx: event.deltaX, dy: event.deltaY)
+        renderer.inject(at: location, delta: delta)
+    }
+
+    override func scrollWheel(with event: NSEvent) {
+        guard let renderer = renderer else { return }
+        let location = convert(event.locationInWindow, from: nil)
+        let delta = CGVector(dx: event.scrollingDeltaX, dy: event.scrollingDeltaY)
+        renderer.inject(at: location, delta: delta)
+    }
+
     override func updateTrackingAreas() {
         super.updateTrackingAreas()
         if let trackingArea = trackingArea {
             removeTrackingArea(trackingArea)
         }
-        let options: NSTrackingArea.Options = [.mouseMoved, .activeAlways, .inVisibleRect]
+        let options: NSTrackingArea.Options = [.mouseMoved, .activeAlways, .inVisibleRect, .enabledDuringMouseDrag]
         let area = NSTrackingArea(rect: bounds, options: options, owner: self, userInfo: nil)
         addTrackingArea(area)
         trackingArea = area
