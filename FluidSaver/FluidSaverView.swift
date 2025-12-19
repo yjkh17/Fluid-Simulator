@@ -1,136 +1,36 @@
-import AppKit
-import MetalKit
 import ScreenSaver
+import AppKit
 
+@objc(FluidSaverView)
 final class FluidSaverView: ScreenSaverView {
-    private let metalView: MTKView
-    private var renderer: FluidSaverRenderer?
-    private var lastTimestamp: CFTimeInterval = CACurrentMediaTime()
-    private var trackingArea: NSTrackingArea?
-    private var lastCursorLocation: NSPoint?
+
+    private var t: CGFloat = 0
 
     override init?(frame: NSRect, isPreview: Bool) {
-        self.metalView = MTKView(frame: frame)
-        self.renderer = nil
         super.init(frame: frame, isPreview: isPreview)
-        configureView()
+        animationTimeInterval = 1.0 / 60.0
     }
 
     required init?(coder: NSCoder) {
-        self.metalView = MTKView(frame: .zero)
-        self.renderer = nil
         super.init(coder: coder)
-        configureView()
-    }
-
-    override var acceptsFirstResponder: Bool { true }
-
-    override func viewDidMoveToWindow() {
-        super.viewDidMoveToWindow()
-        window?.acceptsMouseMovedEvents = true
-    }
-
-    override func startAnimation() {
-        super.startAnimation()
-        window?.acceptsMouseMovedEvents = true
-        lastTimestamp = CACurrentMediaTime()
-        lastCursorLocation = nil
-        updateTrackingAreas()
+        animationTimeInterval = 1.0 / 60.0
     }
 
     override func animateOneFrame() {
-        guard let renderer = renderer else { return }
-
-        let now = CACurrentMediaTime()
-        let rawDelta = now - lastTimestamp
-        lastTimestamp = now
-
-        let clamped = min(max(rawDelta, 1.0 / 120.0), 1.0 / 15.0)
-        renderer.updateDrawableSizeForCurrentBounds()
-        pollMouseAndInject(using: renderer)
-        renderer.update(dt: Float(clamped))
-        metalView.setNeedsDisplay(metalView.bounds)
-        metalView.draw()
+        t += 0.01
+        needsDisplay = true
     }
 
-    override func mouseMoved(with event: NSEvent) {
-        handlePointerEvent(event, scrollDelta: nil)
-    }
+    override func draw(_ rect: NSRect) {
+        let v = (sin(t) * 0.5 + 0.5)
+        NSColor(calibratedWhite: v, alpha: 1).setFill()
+        rect.fill()
 
-    override func mouseDragged(with event: NSEvent) {
-        handlePointerEvent(event, scrollDelta: nil)
-    }
-
-    override func scrollWheel(with event: NSEvent) {
-        handlePointerEvent(event, scrollDelta: CGVector(dx: event.scrollingDeltaX, dy: event.scrollingDeltaY))
-    }
-
-    override func updateTrackingAreas() {
-        super.updateTrackingAreas()
-        if let trackingArea = trackingArea {
-            removeTrackingArea(trackingArea)
-        }
-        let options: NSTrackingArea.Options = [.mouseMoved, .activeAlways, .inVisibleRect, .enabledDuringMouseDrag]
-        let area = NSTrackingArea(rect: bounds, options: options, owner: self, userInfo: nil)
-        addTrackingArea(area)
-        trackingArea = area
-    }
-
-    override var hasConfigureSheet: Bool { false }
-    override var configureSheet: NSWindow? { nil }
-
-    // MARK: - Private helpers
-
-    private func configureView() {
-        animationTimeInterval = 1.0 / 60.0
-        metalView.frame = bounds
-        metalView.autoresizingMask = [.width, .height]
-        metalView.wantsLayer = true
-        metalView.layer?.isOpaque = true
-        metalView.enableSetNeedsDisplay = true
-        addSubview(metalView)
-
-        renderer = FluidSaverRenderer(view: metalView)
-        window?.acceptsMouseMovedEvents = true
-        updateTrackingAreas()
-    }
-
-    private func handlePointerEvent(_ event: NSEvent, scrollDelta: CGVector?) {
-        guard let renderer = renderer else { return }
-        let location = convert(event.locationInWindow, from: nil)
-        let delta: CGVector
-
-        if let scrollDelta {
-            delta = scrollDelta
-        } else {
-            let previous = lastCursorLocation ?? location
-            delta = CGVector(dx: location.x - previous.x, dy: location.y - previous.y)
-        }
-
-        lastCursorLocation = location
-        renderer.inject(at: location, delta: delta)
-    }
-
-    private func pollMouseAndInject(using renderer: FluidSaverRenderer) {
-        guard let point = currentMousePointInView() else {
-            lastCursorLocation = nil
-            return
-        }
-
-        let previous = lastCursorLocation ?? point
-        let delta = CGVector(dx: point.x - previous.x, dy: point.y - previous.y)
-        lastCursorLocation = point
-        renderer.inject(at: point, delta: delta)
-    }
-
-    private func currentMousePointInView() -> CGPoint? {
-        guard let window else { return nil }
-
-        let globalLocation = NSEvent.mouseLocation
-        let windowPoint = window.convertPoint(fromScreen: globalLocation)
-        let viewPoint = convert(windowPoint, from: nil)
-
-        guard bounds.contains(viewPoint) else { return nil }
-        return viewPoint
+        let s = "Running ✅"
+        let attrs: [NSAttributedString.Key: Any] = [
+            .foregroundColor: NSColor.red,
+            .font: NSFont.systemFont(ofSize: 32, weight: .bold)
+        ]
+        s.draw(at: CGPoint(x: 40, y: 40), withAttributes: attrs)
     }
 }
