@@ -39,6 +39,7 @@ struct FluidGPUCanvasView: UIViewRepresentable {
             let hoverGesture = UIHoverGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleHover(_:)))
             hoverGesture.allowedTouchTypes = [NSNumber(value: UITouch.TouchType.indirectPointer.rawValue)]
             metalView.addGestureRecognizer(hoverGesture)
+            metalView.addInteraction(UIPointerInteraction(delegate: context.coordinator))
         }
         
         return metalView
@@ -61,7 +62,7 @@ struct FluidGPUCanvasView: UIViewRepresentable {
         private var lastCommandBufferEndTime: CFTimeInterval?
         private let maxDeltaTime: Float = 1.0 / 30.0
         private var lastHoverLocation: CGPoint?
-        private var lastHoverTimestamp: CFTimeInterval?
+        private var lastPointerTimestamp: CFTimeInterval?
         
         init(simulator: FluidSimulatorGPU, selectedPalette: ColorPalette) {
             self.simulator = simulator
@@ -133,26 +134,12 @@ struct FluidGPUCanvasView: UIViewRepresentable {
             switch gesture.state {
             case .began, .changed:
                 let location = gesture.location(in: view)
-                let now = CACurrentMediaTime()
-                
-                let velocity: CGPoint
-                if let lastLocation = lastHoverLocation, let lastTimestamp = lastHoverTimestamp {
-                    let dt = max(now - lastTimestamp, 0.001)
-                    velocity = CGPoint(
-                        x: (location.x - lastLocation.x) / dt,
-                        y: (location.y - lastLocation.y) / dt
-                    )
-                } else {
-                    velocity = .zero
-                }
-                
-                addForce(in: view, at: location, velocity: velocity)
-                lastHoverLocation = location
-                lastHoverTimestamp = now
+                let now = gesture.timestamp
+                handlePointerMove(location: location, in: view, timestamp: now)
                 
             case .ended, .cancelled:
                 lastHoverLocation = nil
-                lastHoverTimestamp = nil
+                lastPointerTimestamp = nil
             default:
                 break
             }
@@ -210,6 +197,36 @@ struct FluidGPUCanvasView: UIViewRepresentable {
                 color: color
             )
         }
+
+        private func handlePointerMove(location: CGPoint, in view: UIView, timestamp: CFTimeInterval) {
+            let velocity: CGPoint
+            if let lastLocation = lastHoverLocation, let lastTimestamp = lastPointerTimestamp {
+                let dt = max(timestamp - lastTimestamp, 0.001)
+                velocity = CGPoint(
+                    x: (location.x - lastLocation.x) / dt,
+                    y: (location.y - lastLocation.y) / dt
+                )
+            } else {
+                velocity = .zero
+            }
+
+            addForce(in: view, at: location, velocity: velocity)
+            lastHoverLocation = location
+            lastPointerTimestamp = timestamp
+        }
+    }
+}
+
+@available(iOS 13.4, *)
+extension FluidGPUCanvasView.Coordinator: UIPointerInteractionDelegate {
+    func pointerInteraction(_ interaction: UIPointerInteraction, regionFor request: UIPointerRegionRequest) -> UIPointerRegion? {
+        guard let view = interaction.view else { return nil }
+
+        let location = request.location(in: view)
+        handlePointerMove(location: location, in: view, timestamp: request.timestamp)
+
+        // Minimal region keeps updates flowing without altering pointer appearance
+        return UIPointerRegion(rect: CGRect(origin: location, size: .zero))
     }
 }
 
