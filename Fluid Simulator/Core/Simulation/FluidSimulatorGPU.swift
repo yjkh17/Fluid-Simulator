@@ -5,6 +5,7 @@
 //  Created by Yousef Jawdat on 06/06/2025.
 //
 
+import Foundation
 import Metal
 import MetalKit
 import simd
@@ -149,8 +150,9 @@ class FluidSimulatorGPU: ObservableObject {
     }
     
     private func setupPipelineStates() {
-        guard let library = device.makeDefaultLibrary() else {
-            print("Failed to get default library")
+        let bundle = Bundle(for: FluidSimulatorGPU.self)
+        guard let library = try? device.makeDefaultLibrary(bundle: bundle) else {
+            NSLog("❌ Failed to get default library from bundle: \(bundle.bundlePath)")
             return
         }
         
