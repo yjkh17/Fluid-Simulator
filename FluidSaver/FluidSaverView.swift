@@ -47,7 +47,9 @@ final class FluidSaverView: ScreenSaverView {
 
         let clamped = min(max(rawDelta, 1.0 / 120.0), 1.0 / 15.0)
         renderer.updateDrawableSizeForCurrentBounds()
+        pollMouseAndInject(using: renderer)
         renderer.update(dt: Float(clamped))
+        metalView.setNeedsDisplay(metalView.bounds)
         metalView.draw()
     }
 
@@ -85,6 +87,7 @@ final class FluidSaverView: ScreenSaverView {
         metalView.autoresizingMask = [.width, .height]
         metalView.wantsLayer = true
         metalView.layer?.isOpaque = true
+        metalView.enableSetNeedsDisplay = true
         addSubview(metalView)
 
         renderer = FluidSaverRenderer(view: metalView)
@@ -106,5 +109,28 @@ final class FluidSaverView: ScreenSaverView {
 
         lastCursorLocation = location
         renderer.inject(at: location, delta: delta)
+    }
+
+    private func pollMouseAndInject(using renderer: FluidSaverRenderer) {
+        guard let point = currentMousePointInView() else {
+            lastCursorLocation = nil
+            return
+        }
+
+        let previous = lastCursorLocation ?? point
+        let delta = CGVector(dx: point.x - previous.x, dy: point.y - previous.y)
+        lastCursorLocation = point
+        renderer.inject(at: point, delta: delta)
+    }
+
+    private func currentMousePointInView() -> CGPoint? {
+        guard let window else { return nil }
+
+        let globalLocation = NSEvent.mouseLocation
+        let windowPoint = window.convertPoint(fromScreen: globalLocation)
+        let viewPoint = convert(windowPoint, from: nil)
+
+        guard bounds.contains(viewPoint) else { return nil }
+        return viewPoint
     }
 }
