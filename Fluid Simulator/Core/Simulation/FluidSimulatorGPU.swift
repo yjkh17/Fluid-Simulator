@@ -55,8 +55,8 @@ class FluidSimulatorGPU: ObservableObject {
     @Published var parameters: FluidParameters
     
     // Grid dimensions
-    let width: Int
-    let height: Int
+    @Published private(set) var width: Int
+    @Published private(set) var height: Int
     
     // MARK: - Initialization
     
@@ -75,6 +75,23 @@ class FluidSimulatorGPU: ObservableObject {
         setupPipelineStates()
         setupUniforms()
         setupSampler()
+    }
+    
+    // MARK: - Resize Handling
+    
+    func resize(width newWidth: Int, height newHeight: Int) {
+        let clampedWidth = max(1, newWidth)
+        let clampedHeight = max(1, newHeight)
+        
+        guard clampedWidth != width || clampedHeight != height else {
+            return
+        }
+        
+        width = clampedWidth
+        height = clampedHeight
+        
+        setupTextures()
+        updateUniforms()
     }
     
     // MARK: - Setup Methods

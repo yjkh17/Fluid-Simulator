@@ -7,6 +7,7 @@
 
 import SwiftUI
 import Metal
+import UIKit
 
 struct MainView: View {
     @StateObject private var hapticsManager = HapticsManager()
@@ -14,12 +15,19 @@ struct MainView: View {
     @State private var selectedPalette = ColorPalette.palettes[0]
     @State private var showSettings = false
     @State private var showDebugOverlay = false
+    private let deviceScale: CGFloat
     
     // CLEANUP: GPU simulator is now the single source of truth
     init() {
+        let screen = UIScreen.main
+        deviceScale = screen.scale
+        
+        let initialPixelSize = CGSize(width: screen.bounds.width * screen.scale, height: screen.bounds.height * screen.scale)
+        let initialGrid = FluidGridSizing.quantizedGrid(forPixelSize: initialPixelSize, deviceScale: screen.scale)
+        
         // Create GPU simulator with optimal dimensions for performance (following blueprint)
         guard let device = MTLCreateSystemDefaultDevice(),
-              let simulator = FluidSimulatorGPU(device: device, width: 128, height: 256) else {
+              let simulator = FluidSimulatorGPU(device: device, width: initialGrid.width, height: initialGrid.height) else {
             fatalError("Failed to create GPU simulator - Metal not available")
         }
         
@@ -37,6 +45,7 @@ struct MainView: View {
                 FluidGPUCanvasView(
                     selectedPalette: selectedPalette,
                     screenSize: geometry.size,
+                    deviceScale: deviceScale,
                     simulator: gpuSimulator
                 )
                 .ignoresSafeArea()

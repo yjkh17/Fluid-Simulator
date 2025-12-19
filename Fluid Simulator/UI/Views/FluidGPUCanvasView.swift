@@ -8,10 +8,33 @@
 import SwiftUI
 import MetalKit
 
+struct FluidGridSizing {
+    private static let threadGroupStep: CGFloat = 16
+    private static let maxDimension: CGFloat = 2048
+    
+    static func quantizedGrid(forPixelSize pixelSize: CGSize, deviceScale: CGFloat) -> (width: Int, height: Int) {
+        let pixelsPerCell = max(2.0, deviceScale * 2.0)
+        let targetWidth = pixelSize.width / pixelsPerCell
+        let targetHeight = pixelSize.height / pixelsPerCell
+        
+        return (
+            quantize(length: targetWidth),
+            quantize(length: targetHeight)
+        )
+    }
+    
+    private static func quantize(length: CGFloat) -> Int {
+        let quantized = (length / threadGroupStep).rounded(.toNearestOrAwayFromZero) * threadGroupStep
+        let clamped = max(threadGroupStep, min(maxDimension, quantized))
+        return Int(clamped)
+    }
+}
+
 /// Step 4: GPU-first canvas view using FluidSimulatorGPU as single source of truth
 struct FluidGPUCanvasView: UIViewRepresentable {
     let selectedPalette: ColorPalette
     let screenSize: CGSize
+    let deviceScale: CGFloat
     @ObservedObject var simulator: FluidSimulatorGPU
     
     func makeUIView(context: Context) -> MTKView {
@@ -31,6 +54,11 @@ struct FluidGPUCanvasView: UIViewRepresentable {
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap(_:)))
         metalView.addGestureRecognizer(tapGesture)
         
+        let scale = metalView.contentScaleFactor
+        let initialPixelSize = CGSize(width: screenSize.width * scale, height: screenSize.height * scale)
+        let initialGrid = FluidGridSizing.quantizedGrid(forPixelSize: initialPixelSize, deviceScale: scale)
+        simulator.resize(width: initialGrid.width, height: initialGrid.height)
+        
         return metalView
     }
     
@@ -39,21 +67,25 @@ struct FluidGPUCanvasView: UIViewRepresentable {
     }
     
     func makeCoordinator() -> Coordinator {
-        Coordinator(simulator: simulator, selectedPalette: selectedPalette)
+        Coordinator(simulator: simulator, selectedPalette: selectedPalette, deviceScale: deviceScale)
     }
     
     class Coordinator: NSObject, MTKViewDelegate {
         let simulator: FluidSimulatorGPU
         var selectedPalette: ColorPalette
+        let deviceScale: CGFloat
         
-        init(simulator: FluidSimulatorGPU, selectedPalette: ColorPalette) {
+        init(simulator: FluidSimulatorGPU, selectedPalette: ColorPalette, deviceScale: CGFloat) {
             self.simulator = simulator
             self.selectedPalette = selectedPalette
+            self.deviceScale = deviceScale
             super.init()
         }
         
         func mtkView(_ view: MTKView, drawableSizeWillChange size: CGSize) {
-            // GPU simulator handles its own sizing
+            let scale = max(deviceScale, view.contentScaleFactor)
+            let grid = FluidGridSizing.quantizedGrid(forPixelSize: size, deviceScale: scale)
+            simulator.resize(width: grid.width, height: grid.height)
         }
         
         func draw(in view: MTKView) {
@@ -134,6 +166,7 @@ struct FluidGPUCanvasView: UIViewRepresentable {
             FluidGPUCanvasView(
                 selectedPalette: ColorPalette.palettes[0],
                 screenSize: CGSize(width: 400, height: 800),
+                deviceScale: UIScreen.main.scale,
                 simulator: simulator
             )
         } else {
