@@ -8,7 +8,7 @@ final class FluidSaverView: ScreenSaverView {
     private var lastTimestamp: CFTimeInterval = CACurrentMediaTime()
     private var trackingArea: NSTrackingArea?
 
-    override init(frame: NSRect, isPreview: Bool) {
+    override init?(frame: NSRect, isPreview: Bool) {
         self.metalView = MTKView(frame: frame)
         self.renderer = nil
         super.init(frame: frame, isPreview: isPreview)
