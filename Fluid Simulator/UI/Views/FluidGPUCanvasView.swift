@@ -31,6 +31,12 @@ struct FluidGPUCanvasView: UIViewRepresentable {
         
         let tapGesture = UITapGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleTap(_:)))
         metalView.addGestureRecognizer(tapGesture)
+
+        // Pointer hover support so moving the cursor injects fluid without a drag
+        if #available(iOS 13.4, *) {
+            let hoverGesture = UIHoverGestureRecognizer(target: context.coordinator, action: #selector(Coordinator.handleHover(_:)))
+            metalView.addGestureRecognizer(hoverGesture)
+        }
         
         return metalView
     }
@@ -51,6 +57,8 @@ struct FluidGPUCanvasView: UIViewRepresentable {
         private var lastFrameTimestamp: CFTimeInterval?
         private var lastCommandBufferEndTime: CFTimeInterval?
         private let maxDeltaTime: Float = 1.0 / 30.0
+        private var lastHoverLocation: CGPoint?
+        private var lastHoverTimestamp: CFTimeInterval?
         
         init(simulator: FluidSimulatorGPU, selectedPalette: ColorPalette) {
             self.simulator = simulator
@@ -113,27 +121,38 @@ struct FluidGPUCanvasView: UIViewRepresentable {
             let location = gesture.location(in: view)
             let velocity = gesture.velocity(in: view)
             
-            // Convert to normalized coordinates
-            let normalizedPos = SIMD2<Float>(
-                Float(location.x / view.bounds.width),
-                Float(1.0 - location.y / view.bounds.height)
-            )
+            addForce(in: view, at: location, velocity: velocity)
+        }
+
+        @objc func handleHover(_ gesture: UIHoverGestureRecognizer) {
+            guard let view = gesture.view else { return }
             
-            // Scale velocity appropriately
-            let normalizedVel = SIMD2<Float>(
-                Float(velocity.x / view.bounds.width * 0.1),
-                Float(-velocity.y / view.bounds.height * 0.1)
-            )
-            
-            let color = selectedPalette.getRandomColor()
-            
-            // Add force directly to GPU
-            simulator.addForce(
-                at: normalizedPos,
-                velocity: normalizedVel,
-                radius: 50.0,
-                color: color
-            )
+            switch gesture.state {
+            case .began, .changed:
+                let location = gesture.location(in: view)
+                let now = CACurrentMediaTime()
+                
+                let velocity: CGPoint
+                if let lastLocation = lastHoverLocation, let lastTimestamp = lastHoverTimestamp {
+                    let dt = max(now - lastTimestamp, 0.001)
+                    velocity = CGPoint(
+                        x: (location.x - lastLocation.x) / dt,
+                        y: (location.y - lastLocation.y) / dt
+                    )
+                } else {
+                    velocity = .zero
+                }
+                
+                addForce(in: view, at: location, velocity: velocity)
+                lastHoverLocation = location
+                lastHoverTimestamp = now
+                
+            case .ended, .cancelled:
+                lastHoverLocation = nil
+                lastHoverTimestamp = nil
+            default:
+                break
+            }
         }
         
         @objc func handleTap(_ gesture: UITapGestureRecognizer) {
@@ -160,6 +179,33 @@ struct FluidGPUCanvasView: UIViewRepresentable {
                     color: color
                 )
             }
+        }
+
+        private func addForce(in view: UIView, at location: CGPoint, velocity: CGPoint) {
+            guard view.bounds.width > 0, view.bounds.height > 0 else { return }
+
+            let normalizedPos = SIMD2<Float>(
+                Float(location.x / view.bounds.width),
+                Float(1.0 - location.y / view.bounds.height)
+            )
+
+            let normalizedVel = SIMD2<Float>(
+                Float(velocity.x / view.bounds.width * 0.1),
+                Float(-velocity.y / view.bounds.height * 0.1)
+            )
+
+            let color = selectedPalette.getRandomColor()
+            let radius = max(
+                30.0,
+                Float(min(simulator.width, simulator.height)) * 0.4
+            )
+
+            simulator.addForce(
+                at: normalizedPos,
+                velocity: normalizedVel,
+                radius: radius,
+                color: color
+            )
         }
     }
 }
