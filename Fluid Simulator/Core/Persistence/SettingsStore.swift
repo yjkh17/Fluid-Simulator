@@ -23,7 +23,7 @@ class SettingsStore: ObservableObject {
     }
     
     // Interaction settings for GPU touch handling
-    struct InteractionSettings: Codable {
+    struct InteractionSettings: Codable, Equatable {
         var splatRadius: Float = 50.0          // GPU splat radius in pixels
         var splatForce: Float = 1.0            // GPU force multiplier
         var selectedPaletteIndex: Int = 0
