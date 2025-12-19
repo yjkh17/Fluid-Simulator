@@ -7,6 +7,7 @@ final class FluidSaverView: ScreenSaverView {
     private var renderer: FluidSaverRenderer?
     private var lastTimestamp: CFTimeInterval = CACurrentMediaTime()
     private var trackingArea: NSTrackingArea?
+    private var lastCursorLocation: NSPoint?
 
     override init?(frame: NSRect, isPreview: Bool) {
         self.metalView = MTKView(frame: frame)
@@ -32,6 +33,9 @@ final class FluidSaverView: ScreenSaverView {
     override func startAnimation() {
         super.startAnimation()
         window?.acceptsMouseMovedEvents = true
+        lastTimestamp = CACurrentMediaTime()
+        lastCursorLocation = nil
+        updateTrackingAreas()
     }
 
     override func animateOneFrame() {
@@ -48,24 +52,15 @@ final class FluidSaverView: ScreenSaverView {
     }
 
     override func mouseMoved(with event: NSEvent) {
-        guard let renderer = renderer else { return }
-        let location = convert(event.locationInWindow, from: nil)
-        let delta = CGVector(dx: event.deltaX, dy: event.deltaY)
-        renderer.inject(at: location, delta: delta)
+        handlePointerEvent(event, scrollDelta: nil)
     }
 
     override func mouseDragged(with event: NSEvent) {
-        guard let renderer = renderer else { return }
-        let location = convert(event.locationInWindow, from: nil)
-        let delta = CGVector(dx: event.deltaX, dy: event.deltaY)
-        renderer.inject(at: location, delta: delta)
+        handlePointerEvent(event, scrollDelta: nil)
     }
 
     override func scrollWheel(with event: NSEvent) {
-        guard let renderer = renderer else { return }
-        let location = convert(event.locationInWindow, from: nil)
-        let delta = CGVector(dx: event.scrollingDeltaX, dy: event.scrollingDeltaY)
-        renderer.inject(at: location, delta: delta)
+        handlePointerEvent(event, scrollDelta: CGVector(dx: event.scrollingDeltaX, dy: event.scrollingDeltaY))
     }
 
     override func updateTrackingAreas() {
@@ -95,5 +90,21 @@ final class FluidSaverView: ScreenSaverView {
         renderer = FluidSaverRenderer(view: metalView)
         window?.acceptsMouseMovedEvents = true
         updateTrackingAreas()
+    }
+
+    private func handlePointerEvent(_ event: NSEvent, scrollDelta: CGVector?) {
+        guard let renderer = renderer else { return }
+        let location = convert(event.locationInWindow, from: nil)
+        let delta: CGVector
+
+        if let scrollDelta {
+            delta = scrollDelta
+        } else {
+            let previous = lastCursorLocation ?? location
+            delta = CGVector(dx: location.x - previous.x, dy: location.y - previous.y)
+        }
+
+        lastCursorLocation = location
+        renderer.inject(at: location, delta: delta)
     }
 }
