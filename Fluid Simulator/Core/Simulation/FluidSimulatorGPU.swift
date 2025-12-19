@@ -34,6 +34,7 @@ class FluidSimulatorGPU: ObservableObject {
     private let commandQueue: MTLCommandQueue
     private var gpuState: FluidGPUState?
     private var drawable: MTLDrawable?
+    @Published var lastStepDelta: Float = 0
     
     // Pipeline states for each kernel
     private var advectionPSO: MTLComputePipelineState?
@@ -226,6 +227,13 @@ class FluidSimulatorGPU: ObservableObject {
 
         if let dt {
             parameters.timeStep = dt
+            DispatchQueue.main.async {
+                self.lastStepDelta = dt
+            }
+        } else {
+            DispatchQueue.main.async {
+                self.lastStepDelta = self.parameters.timeStep
+            }
         }
         
         updateUniforms()
@@ -414,7 +422,7 @@ class FluidSimulatorGPU: ObservableObject {
     
     // MARK: - Rendering
     
-    func render(to renderPassDescriptor: MTLRenderPassDescriptor, drawable: MTLDrawable) {
+    func render(to renderPassDescriptor: MTLRenderPassDescriptor, drawable: MTLDrawable, configure: ((MTLCommandBuffer) -> Void)? = nil) {
         guard let gpuState = gpuState,
               let renderPSO = renderPSO,
               let sampler = sampler,
@@ -432,6 +440,7 @@ class FluidSimulatorGPU: ObservableObject {
         encoder.drawPrimitives(type: .triangle, vertexStart: 0, vertexCount: 6)
         encoder.endEncoding()
         
+        configure?(commandBuffer)
         commandBuffer.present(drawable)
         commandBuffer.commit()
     }
