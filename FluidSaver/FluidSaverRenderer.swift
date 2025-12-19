@@ -27,6 +27,7 @@ final class FluidSaverRenderer: NSObject, MTKViewDelegate {
         self.sim = sim
         super.init()
         mtkView.delegate = self
+        sim.ensureSeeded()
     }
 
     func update(dt: Float) {

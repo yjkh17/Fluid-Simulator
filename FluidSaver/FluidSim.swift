@@ -11,6 +11,7 @@ final class FluidSim {
     private var simulator: FluidSimulatorGPU
     private var gridSize: (width: Int, height: Int)
     private var colorPhase: Float = 0.0
+    private var hasSeeded = false
 
     init?(device: MTLDevice, drawableSize: CGSize) {
         self.device = device
@@ -27,6 +28,7 @@ final class FluidSim {
 
         self.simulator = simulator
         configureParameters()
+        ensureSeeded()
     }
 
     func updateDrawableSize(_ size: CGSize) {
@@ -42,6 +44,8 @@ final class FluidSim {
             simulator = newSim
             gridSize = desired
             configureParameters()
+            hasSeeded = false
+            ensureSeeded()
         }
     }
 
@@ -68,6 +72,7 @@ final class FluidSim {
             radius: radius,
             color: nextColor()
         )
+        hasSeeded = true
     }
 
     func render(to descriptor: MTLRenderPassDescriptor, drawable: MTLDrawable) {
@@ -84,6 +89,21 @@ final class FluidSim {
         simulator.parameters.fadeRate = 0.985
         simulator.parameters.forceMultiplier = 26.0
         simulator.parameters.projectionIterations = 35
+    }
+
+    func ensureSeeded() {
+        guard !hasSeeded else { return }
+
+        let center = SIMD2<Float>(0.5, 0.5)
+        let upward = SIMD2<Float>(0.0, 18.0)
+        let radius = Float(max(gridSize.width, gridSize.height)) * 0.06
+        simulator.addForce(at: center, velocity: upward, radius: radius, color: nextColor())
+
+        let swirlOffset = SIMD2<Float>(0.18, -0.12)
+        let swirlVelocity = SIMD2<Float>(-upward.y * 0.25, upward.x * 0.15)
+        simulator.addForce(at: center + swirlOffset, velocity: swirlVelocity, radius: radius * 0.7, color: nextColor())
+
+        hasSeeded = true
     }
 
     private static func gridDimensions(for size: CGSize) -> (width: Int, height: Int) {
